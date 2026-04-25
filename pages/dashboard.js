@@ -1,234 +1,100 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Layout from '../components/Layout';
+import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import io from 'socket.io-client';
+import { Layout } from '../components/layout/Layout';
+import { Alert } from '../components/ui/Alert';
+import { Button } from '../components/ui/Button';
+import { PulsePanel } from '../components/dashboard/PulsePanel';
+import { SentimentSummary } from '../components/dashboard/SentimentSummary';
+import { StatsPanel } from '../components/dashboard/StatsPanel';
+import { RecentEvents } from '../components/dashboard/RecentEvents';
+import { useRequireAuth } from '../hooks/useRequireAuth';
+import { api } from '../lib/apiClient';
 
-export default function Dashboard() {
+export default function DashboardPage() {
+  const { ready, user } = useRequireAuth();
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
-    fetchData();
-    setupSocket();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setData(result);
-      } else if (response.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        router.push('/login');
-      } else {
-        setError('Failed to load dashboard data');
-      }
-    } catch (error) {
-      setError('Network error');
+      const result = await api.get('/api/dashboard');
+      setData(result);
+      setError('');
+    } catch (e) {
+      setError(e.message || 'Failed to load dashboard');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const setupSocket = () => {
-    const socket = io();
+  useEffect(() => {
+    if (!ready) return undefined;
+    fetchData();
 
-    socket.on('sentimentUpdate', () => {
-      fetchData(); // Refresh data on real-time updates
-    });
+    let socket;
+    (async () => {
+      try {
+        await fetch('/api/socket');
+        socket = io({ path: '/api/socket' });
+        socket.on('sentimentUpdate', () => fetchData());
+      } catch {
+        /* socket optional */
+      }
+    })();
 
     return () => {
-      socket.disconnect();
+      if (socket) socket.disconnect();
     };
-  };
+  }, [ready, fetchData]);
 
-  if (loading) {
+  if (!ready || loading) {
     return (
-      <Layout title="Dashboard - Classroom Engagement Monitor">
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p>Loading dashboard...</p>
-        </div>
+      <Layout title="Dashboard">
+        <div className="loader">Loading dashboard…</div>
       </Layout>
     );
   }
 
   if (error) {
     return (
-      <Layout title="Dashboard - Classroom Engagement Monitor">
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <div style={{
-            backgroundColor: '#ffebee',
-            color: '#c62828',
-            padding: '1rem',
-            borderRadius: '4px',
-            marginBottom: '1rem'
-          }}>
-            {error}
-          </div>
-          <button
-            onClick={fetchData}
-            style={{
-              backgroundColor: '#2e7d32',
-              color: 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Retry
-          </button>
-        </div>
+      <Layout title="Dashboard">
+        <Alert kind="danger">{error}</Alert>
+        <Button onClick={fetchData}>Retry</Button>
       </Layout>
     );
   }
 
-  const { currentSentiment, statistics } = data;
+  const { currentSentiment, statistics, connectedDevices, recentEvents } = data;
+  const showAlert = currentSentiment.percentageBad > 45 && currentSentiment.total > 0;
 
   return (
-    <Layout title="Dashboard - Classroom Engagement Monitor">
-      <div>
-        <h2 style={{ color: '#2e7d32', marginBottom: '2rem' }}>Classroom Engagement Dashboard</h2>
+    <Layout title="Dashboard - Engagement Monitor">
+      <div className="page-heading">
+        <h2>Engagement dashboard</h2>
+        <p className="muted">Welcome back, <strong>{user.username}</strong> — role: {user.role}</p>
+      </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '1.5rem',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            textAlign: 'center'
-          }}>
-            <h3 style={{ color: '#4caf50', marginBottom: '1rem' }}>😊 Good</h3>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#4caf50' }}>
-              {currentSentiment.good}
-            </div>
-            <div style={{ color: '#666', marginTop: '0.5rem' }}>
-              {currentSentiment.percentageGood}%
-            </div>
-          </div>
+      {showAlert && (
+        <Alert kind="warning">
+          <strong>Heads up:</strong> high confusion or negative sentiment detected. Consider pausing
+          to re-engage the class.
+        </Alert>
+      )}
 
-          <div style={{
-            backgroundColor: 'white',
-            padding: '1.5rem',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            textAlign: 'center'
-          }}>
-            <h3 style={{ color: '#f44336', marginBottom: '1rem' }}>😞 Bad</h3>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f44336' }}>
-              {currentSentiment.bad}
-            </div>
-            <div style={{ color: '#666', marginTop: '0.5rem' }}>
-              {currentSentiment.percentageBad}%
-            </div>
-          </div>
-
-          <div style={{
-            backgroundColor: 'white',
-            padding: '1.5rem',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            textAlign: 'center'
-          }}>
-            <h3 style={{ color: '#ff9800', marginBottom: '1rem' }}>❓ Question</h3>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#ff9800' }}>
-              {currentSentiment.question}
-            </div>
-            <div style={{ color: '#666', marginTop: '0.5rem' }}>
-              {currentSentiment.percentageQuestion}%
-            </div>
-          </div>
-
-          <div style={{
-            backgroundColor: 'white',
-            padding: '1.5rem',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            textAlign: 'center'
-          }}>
-            <h3 style={{ color: '#2e7d32', marginBottom: '1rem' }}>📊 Total</h3>
-            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#2e7d32' }}>
-              {currentSentiment.total}
-            </div>
-            <div style={{ color: '#666', marginTop: '0.5rem' }}>
-              Responses
-            </div>
-          </div>
+      <div className="stack">
+        <PulsePanel connectedDevices={connectedDevices} summary={currentSentiment} />
+        <div className="two-col">
+          <SentimentSummary summary={currentSentiment} />
+          <StatsPanel statistics={statistics} />
         </div>
+        <RecentEvents events={recentEvents} />
+      </div>
 
-        <div style={{
-          backgroundColor: 'white',
-          padding: '2rem',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          marginBottom: '2rem'
-        }}>
-          <h3 style={{ marginBottom: '1rem' }}>Statistics</h3>
-          {statistics.message ? (
-            <p style={{ color: '#666', fontStyle: 'italic' }}>{statistics.message}</p>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-              <div>
-                <strong>Total Responses:</strong> {statistics.totalResponses}
-              </div>
-              <div>
-                <strong>Average Good:</strong> {statistics.averageGood}%
-              </div>
-              <div>
-                <strong>Average Bad:</strong> {statistics.averageBad}%
-              </div>
-              <div>
-                <strong>Average Questions:</strong> {statistics.averageQuestion}%
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div style={{ textAlign: 'center' }}>
-          <button
-            onClick={fetchData}
-            style={{
-              backgroundColor: '#2e7d32',
-              color: 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginRight: '1rem'
-            }}
-          >
-            Refresh Data
-          </button>
-          <a
-            href="/devices"
-            style={{
-              backgroundColor: '#4caf50',
-              color: 'white',
-              padding: '0.75rem 1.5rem',
-              textDecoration: 'none',
-              borderRadius: '4px',
-              display: 'inline-block'
-            }}
-          >
-            Manage Devices
-          </a>
-        </div>
+      <div className="row-actions" style={{ marginTop: '1.5rem' }}>
+        <Button onClick={fetchData}>Refresh</Button>
+        <Link href="/devices" className="btn btn-secondary">Manage devices</Link>
       </div>
     </Layout>
   );

@@ -1,171 +1,71 @@
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Layout from '../components/Layout';
+import { Layout } from '../components/layout/Layout';
+import { AuthForm } from '../components/auth/AuthForm';
+import { FormField } from '../components/ui/FormField';
+import { useAuth } from '../contexts/AuthContext';
 
-export default function Register() {
+export default function RegisterPage() {
+  const router = useRouter();
+  const { signUp } = useAuth();
+  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
+  const [role, setRole] = useState('teacher');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
-    setSuccess('');
-
     if (password !== confirmPassword) {
       setError('Passwords do not match');
-      setLoading(false);
       return;
     }
-
+    setSubmitting(true);
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccess('Registration successful! You can now login.');
-        setTimeout(() => {
-          router.push('/login');
-        }, 2000);
-      } else {
-        setError(data.message);
-      }
-    } catch (error) {
-      setError('Network error. Please try again.');
+      await signUp({ email, username, password, role });
+      router.push('/dashboard');
+    } catch (e) {
+      setError(e.message || 'Registration failed');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <Layout title="Register - Classroom Engagement Monitor">
-      <div style={{ maxWidth: '400px', margin: '0 auto' }}>
-        <h2 style={{ color: '#2e7d32', textAlign: 'center', marginBottom: '2rem' }}>Register</h2>
-
-        <form onSubmit={handleSubmit} style={{
-          backgroundColor: 'white',
-          padding: '2rem',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          {error && (
-            <div style={{
-              backgroundColor: '#ffebee',
-              color: '#c62828',
-              padding: '0.75rem',
-              borderRadius: '4px',
-              marginBottom: '1rem'
-            }}>
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div style={{
-              backgroundColor: '#e8f5e8',
-              color: '#2e7d32',
-              padding: '0.75rem',
-              borderRadius: '4px',
-              marginBottom: '1rem'
-            }}>
-              {success}
-            </div>
-          )}
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label htmlFor="username" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '1rem'
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label htmlFor="password" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '1rem'
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label htmlFor="confirmPassword" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '1rem'
-              }}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              backgroundColor: loading ? '#ccc' : '#2e7d32',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '1rem',
-              cursor: loading ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {loading ? 'Registering...' : 'Register'}
-          </button>
-        </form>
-
-        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-          <p>Already have an account? <a href="/login" style={{ color: '#2e7d32' }}>Login here</a></p>
-        </div>
-      </div>
+    <Layout title="Register - Engagement Monitor">
+      <AuthForm
+        title="Create your account"
+        subtitle="Start monitoring classroom engagement in seconds."
+        error={error}
+        submitting={submitting}
+        submitLabel={submitting ? 'Registering' : 'Create account'}
+        onSubmit={handleSubmit}
+        footer={<p>Already have an account? <Link href="/login">Login here</Link></p>}
+      >
+        <FormField label="Email" htmlFor="email">
+          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+        </FormField>
+        <FormField label="Username" htmlFor="username">
+          <input id="username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+        </FormField>
+        <FormField label="Role" htmlFor="role">
+          <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
+            <option value="teacher">Teacher</option>
+            <option value="administrator">Administrator</option>
+            <option value="student">Student</option>
+          </select>
+        </FormField>
+        <FormField label="Password" htmlFor="password">
+          <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" />
+        </FormField>
+        <FormField label="Confirm password" htmlFor="confirmPassword">
+          <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required autoComplete="new-password" />
+        </FormField>
+      </AuthForm>
     </Layout>
   );
 }

@@ -1,3 +1,8 @@
-import SocketHandler from '../../lib/socket';
+import { ensureSocketServer } from '../../lib/server/socket';
 
-export default SocketHandler;
+export const config = { api: { bodyParser: false } };
+
+export default function handler(req, res) {
+  ensureSocketServer(res);
+  res.end();
+}
