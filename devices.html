@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Device Management</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="devices.html">Devices</a></li>
+                <li><button id="logoutBtn" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 1em;">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="deviceManagement">
+            <h2>Register New Device</h2>
+            <form id="deviceForm">
+                <label for="deviceName">Device Name:</label>
+                <input type="text" id="deviceName" placeholder="e.g., Classroom A ESP32" required>
+                <label for="location">Location:</label>
+                <input type="text" id="location" placeholder="e.g., Room 101" required>
+                <button type="submit">Register Device</button>
+            </form>
+            <p id="deviceMessage"></p>
+        </section>
+
+        <section id="devicesList">
+            <h2>Your Registered Devices</h2>
+            <div id="devicesContainer"></div>
+        </section>
+
+        <section id="apiDocumentation">
+            <h2>API Documentation for ESP32</h2>
+            <div class="api-docs">
+                <h3>Data Submission Endpoint</h3>
+                <pre><code>POST /data/submit
+Headers:
+  X-API-Key: &lt;your-api-key&gt;
+  Content-Type: application/json
+
+Body:
+{
+  "status": "good" | "bad" | "question",
+  "studentId": "optional-student-id"
+}
+
+Example cURL:
+curl -X POST http://your-server/data/submit \
+  -H "X-API-Key: YOUR-API-KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"status":"good"}'</code></pre>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 BroncoHacks Engagement System. All rights reserved.</p>
+    </footer>
+
+    <script src="devices-script.js"></script>
+</body>
+</html>
