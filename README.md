@@ -24,14 +24,14 @@ This system enables educators to collect real-time student sentiment data throug
 - Yellow Toggle: "Question/Hand raise" state
 - Status LEDs: Confirmation of message delivery
 
-### Backend (Node.js/Express)
+### Backend (Next.js API Routes)
 - User authentication and device management
 - REST API endpoints for ESP32 data submission
 - WebSocket server for real-time updates
 - In-memory data storage (easily extensible to database)
 - Historical analytics computation
 
-### Frontend (Web Dashboard)
+### Frontend (React/Next.js)
 - Real-time sentiment visualization
 - Interactive charts and statistics
 - Device management interface
@@ -59,15 +59,13 @@ This system enables educators to collect real-time student sentiment data throug
    npm install
    ```
 
-3. **Start the server**
+3. **Start the development server**
    ```bash
-   npm start
-   # or for development with auto-reload:
    npm run dev
    ```
 
 4. **Access the application**
-   - Open browser to `http://localhost:3000`
+   - Open browser to `http://localhost:3000` (or 3001 if 3000 is in use)
    - Register a new account
    - Go to Devices page to register an ESP32 device
    - Copy the API key and use it in your ESP32 code
@@ -76,38 +74,50 @@ This system enables educators to collect real-time student sentiment data throug
 
 ```
 BroncoHacks/
-├── index.html              # Home page with authentication
-├── dashboard.html          # Main dashboard for viewing sentiment data
-├── devices.html            # Device management interface
-├── contact.html            # Contact page
-├── style.css               # Global styles
-├── script.js               # Home page scripts
-├── dashboard-script.js     # Dashboard functionality
-├── devices-script.js       # Device management functionality
-├── server.js               # Express backend server
-├── package.json            # Dependencies and scripts
-├── ESP32_CODE_EXAMPLE.md   # ESP32 implementation guide
-└── README.md               # This file
+├── pages/                  # Next.js pages and API routes
+│   ├── index.js           # Home page
+│   ├── login.js           # Login page
+│   ├── register.js        # Registration page
+│   ├── dashboard.js       # Main dashboard
+│   ├── devices.js         # Device management
+│   ├── _app.js            # Global app component
+│   └── api/               # API routes
+│       ├── register.js    # User registration
+│       ├── login.js       # User authentication
+│       ├── devices.js     # Device management
+│       ├── dashboard.js   # Dashboard data
+│       ├── data.js        # ESP32 data submission
+│       └── socket.js      # Socket.IO initialization
+├── components/            # React components
+│   └── Layout.js          # Layout component
+├── lib/                   # Utility functions
+│   ├── data.js            # Data management and auth
+│   └── socket.js          # Socket.IO server setup
+├── style.css              # Global styles
+├── next.config.js         # Next.js configuration
+├── package.json           # Dependencies and scripts
+├── ESP32_CODE_EXAMPLE.md  # ESP32 implementation guide
+└── README.md              # This file
 ```
 
 ## API Endpoints
 
 ### User Authentication
-- `POST /register` - Create new user account
-- `POST /login` - Authenticate and receive JWT token
-- `GET /protected` - Example protected route
+- `POST /api/register` - Create new user account
+- `POST /api/login` - Authenticate and receive JWT token
 
 ### Device Management
-- `POST /device/register` - Register new ESP32 device (requires JWT)
-- `GET /devices` - List all registered devices (requires JWT)
+- `GET /api/devices` - List all registered devices (requires JWT)
+- `POST /api/devices` - Register new ESP32 device (requires JWT)
 
 ### Data Submission
-- `POST /data/submit` - Submit sensor data from ESP32 (requires API Key)
+- `POST /api/data` - Submit sensor data from ESP32 (requires API Key)
 
 ### Dashboard Data
-- `GET /dashboard/current` - Get current classroom sentiment (requires JWT)
-- `GET /dashboard/history` - Get historical sentiment data (requires JWT)
-- `GET /dashboard/statistics` - Get statistical analysis (requires JWT)
+- `GET /api/dashboard` - Get current classroom sentiment and statistics (requires JWT)
+
+### WebSocket
+- `/api/socket` - Socket.IO endpoint for real-time updates
 
 ## ESP32 Integration
 
