@@ -15,7 +15,7 @@ export function AuthForm({ title, subtitle, error, success, onSubmit, submitting
         <form onSubmit={onSubmit} className="form-grid">
           {children}
           <Button type="submit" disabled={submitting} fullWidth>
-            {submitting ? `${submitLabel}…` : submitLabel}
+            {submitting ? `${submitLabel}...` : submitLabel}
           </Button>
         </form>
       </Card>

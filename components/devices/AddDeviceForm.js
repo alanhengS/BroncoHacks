@@ -50,7 +50,7 @@ export function AddDeviceForm({ onCreate, onCancel }) {
         </FormField>
         <div className="row-actions">
           <Button type="submit" disabled={submitting}>
-            {submitting ? 'Creating…' : 'Create device'}
+            {submitting ? 'Creating...' : 'Create device'}
           </Button>
           <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
         </div>

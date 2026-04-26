@@ -30,18 +30,17 @@ export default function LoginPage() {
 
   return (
     <Layout title="Login - Engagement Monitor">
-      <button 
-        onClick={() => router.back()} 
-        className="back-btn-nice"
-      >
-        ← Back
-      </button>
+      <div className="auth-back">
+        <button type="button" onClick={() => router.back()} className="back-link">
+          Back
+        </button>
+      </div>
       <AuthForm
         title="Welcome back"
         subtitle="Log in to your engagement dashboard."
         error={error}
         submitting={submitting}
-        submitLabel={submitting ? 'Logging in' : 'Login'}
+        submitLabel={submitting ? 'Logging in' : 'Log in'}
         onSubmit={handleSubmit}
         footer={<p>No account? <Link href="/register">Register here</Link></p>}
       >

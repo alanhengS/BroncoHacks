@@ -9,7 +9,7 @@ import { useRequireAuth } from '../hooks/useRequireAuth';
 import { api } from '../lib/apiClient';
 
 export default function DevicesPage() {
-  const { ready, user } = useRequireAuth();
+  const { ready } = useRequireAuth();
   const [devices, setDevices] = useState([]);
   const [scope, setScope] = useState('teacher');
   const [error, setError] = useState('');
@@ -57,7 +57,7 @@ export default function DevicesPage() {
   if (!ready || loading) {
     return (
       <Layout title="Devices">
-        <div className="loader">Loading devices…</div>
+        <div className="loader">Loading devices...</div>
       </Layout>
     );
   }
@@ -74,7 +74,7 @@ export default function DevicesPage() {
           )}
         </div>
         <Button onClick={() => setShowForm((v) => !v)}>
-          {showForm ? 'Cancel' : '+ Add device'}
+          {showForm ? 'Cancel' : 'Add device'}
         </Button>
       </div>
 
@@ -95,15 +95,15 @@ export default function DevicesPage() {
 
       {devices.length > 0 && (
         <div style={{ marginTop: '2rem' }}>
-          <Card title="📋 ESP32 setup">
+          <Card title="ESP32 setup">
             <ol className="setup-list">
-              <li><strong>Copy the session ID when it’s shown</strong> — it is only visible at creation or right after rotating.</li>
+              <li><strong>Copy the session ID when it is shown</strong> - it is only visible at creation or right after rotating.</li>
               <li>Flash the ESP32 with your WiFi credentials and the session ID.</li>
               <li>Wire buttons to GPIO pins (Good: 12, Bad: 13, Question: 14).</li>
               <li>POST to <code>/api/sentiment</code> with header <code>x-session-id</code> and body <code>{'{ "status": "good" }'}</code>.</li>
             </ol>
             <p className="muted" style={{ marginTop: '1rem' }}>
-              Lost a session ID? Click <em>Generate new session ID</em> on the device — the old one stops working immediately.
+              Lost a session ID? Click <em>Generate new session ID</em> on the device. The old one stops working immediately.
             </p>
           </Card>
         </div>

@@ -42,9 +42,9 @@ export default function RegisterPage() {
 
   return (
     <Layout title="Register - Engagement Monitor">
-      <div className="auth-shell">
+      <div className="auth-back">
         <button type="button" onClick={handleBack} className="back-link">
-          ← Back
+          Back
         </button>
       </div>
       <AuthForm
@@ -54,7 +54,7 @@ export default function RegisterPage() {
         submitting={submitting}
         submitLabel={submitting ? 'Registering' : 'Create account'}
         onSubmit={handleSubmit}
-        footer={<p>Already have an account? <Link href="/login">Login here</Link></p>}
+        footer={<p>Already have an account? <Link href="/login">Log in here</Link></p>}
       >
         <FormField label="Email" htmlFor="email">
           <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />

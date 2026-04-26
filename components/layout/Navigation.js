@@ -17,7 +17,10 @@ export function Navigation() {
   return (
     <nav className="app-nav">
       <div className="nav-links">
-        <Link href="/" className="nav-brand">📡 Engagement Monitor</Link>
+        <Link href="/" className="nav-brand">
+          <span className="brand-mark" aria-hidden="true">EM</span>
+          <span>Engagement Monitor</span>
+        </Link>
         {showTeacherLinks && (
           <>
             <Link href="/dashboard">Dashboard</Link>
@@ -32,11 +35,11 @@ export function Navigation() {
               <div>{user.username}</div>
               <small>{role}</small>
             </div>
-            <button onClick={handleSignOut} className="btn btn-secondary">Logout</button>
+            <button onClick={handleSignOut} className="btn btn-secondary">Log out</button>
           </>
         ) : (
           <>
-            <Link href="/login">Login</Link>
+            <Link href="/login">Log in</Link>
             <Link href="/register" className="btn">Register</Link>
           </>
         )}

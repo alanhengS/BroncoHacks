@@ -21,9 +21,9 @@ export function SentimentSummary({ summary }) {
         <p className="muted">No sentiment recorded yet.</p>
       ) : (
         <div className="bars">
-          <Bar label="😊 Good" count={summary.good} percent={summary.percentageGood} tone="good" />
-          <Bar label="❓ Question" count={summary.question} percent={summary.percentageQuestion} tone="question" />
-          <Bar label="😞 Bad" count={summary.bad} percent={summary.percentageBad} tone="bad" />
+          <Bar label="Following" count={summary.good} percent={summary.percentageGood} tone="good" />
+          <Bar label="Questions" count={summary.question} percent={summary.percentageQuestion} tone="question" />
+          <Bar label="Need help" count={summary.bad} percent={summary.percentageBad} tone="bad" />
         </div>
       )}
     </Card>

@@ -1,6 +1,8 @@
-export function Card({ title, action, children, style }) {
+export function Card({ title, action, children, style, className = '' }) {
+  const classes = ['card', className].filter(Boolean).join(' ');
+
   return (
-    <section className="card" style={style}>
+    <section className={classes} style={style}>
       {(title || action) && (
         <header className="card-header">
           {title && <h3 className="card-title">{title}</h3>}

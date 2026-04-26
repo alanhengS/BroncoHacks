@@ -1,9 +1,9 @@
 import { Card } from '../ui/Card';
 
 const STATUS = {
-  good: { label: '😊 Following', tone: 'good' },
-  bad: { label: '😞 Lost', tone: 'bad' },
-  question: { label: '❓ Question', tone: 'question' },
+  good: { label: 'Following', tone: 'good' },
+  bad: { label: 'Need help', tone: 'bad' },
+  question: { label: 'Question', tone: 'question' },
 };
 
 function timeAgo(iso) {
@@ -35,7 +35,7 @@ export function RecentEvents({ events }) {
                 <div className="event-label">{meta.label}</div>
                 <div className="event-device">
                   {e.deviceName}
-                  {e.ownerUsername && <span className="muted"> · {e.ownerUsername}</span>}
+                  {e.ownerUsername && <span className="muted"> - {e.ownerUsername}</span>}
                 </div>
               </div>
               <div className="event-time">{timeAgo(e.timestamp)}</div>

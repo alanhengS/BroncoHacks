@@ -53,7 +53,7 @@ export default function DashboardPage() {
   if (!ready || loading) {
     return (
       <Layout title="Dashboard">
-        <div className="loader">Loading dashboard…</div>
+        <div className="loader">Loading dashboard...</div>
       </Layout>
     );
   }
@@ -76,8 +76,8 @@ export default function DashboardPage() {
       <div className="page-heading">
         <h2>{isAdmin ? 'Administrator overview' : 'Engagement dashboard'}</h2>
         <p className="muted">
-          Welcome back, <strong>{user.username}</strong> — role: {user.role}
-          {isAdmin && <span> · viewing all teachers&apos; data</span>}
+          Welcome back, <strong>{user.username}</strong> - role: {user.role}
+          {isAdmin && <span> - viewing all teachers&apos; data</span>}
         </p>
       </div>
 

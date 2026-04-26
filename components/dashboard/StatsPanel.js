@@ -4,7 +4,7 @@ export function StatsPanel({ statistics }) {
   if (statistics.empty) {
     return (
       <Card title="Statistics">
-        <p className="muted">No data yet — sentiment will populate as devices report in.</p>
+        <p className="muted">No data yet - sentiment will populate as devices report in.</p>
       </Card>
     );
   }

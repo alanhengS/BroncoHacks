@@ -22,11 +22,11 @@ export function DeviceList({ devices, showOwner = false, onRotate, rotatingId })
             <div className="device-row">
               <div>
                 <h3 className="device-name">{device.deviceName}</h3>
-                {device.location && <div className="muted">📍 {device.location}</div>}
+                {device.location && <div className="muted">Location: {device.location}</div>}
                 {showOwner && device.ownerUsername && (
                   <div className="muted">
-                    👤 {device.ownerUsername}
-                    {device.ownerEmail ? ` · ${device.ownerEmail}` : ''}
+                    Owner: {device.ownerUsername}
+                    {device.ownerEmail ? ` - ${device.ownerEmail}` : ''}
                   </div>
                 )}
               </div>
@@ -36,7 +36,7 @@ export function DeviceList({ devices, showOwner = false, onRotate, rotatingId })
                   <>
                     <div className="api-key">{device.sessionId}</div>
                     <small className="muted" style={{ fontSize: '0.75rem' }}>
-                      Copy now — this is the only time it will be shown.
+                      Copy now. This is the only time it will be shown.
                     </small>
                     <Button
                       variant="secondary"
@@ -47,14 +47,14 @@ export function DeviceList({ devices, showOwner = false, onRotate, rotatingId })
                   </>
                 ) : (
                   <>
-                    <div className="api-key api-key-hidden">••••••••••••••••</div>
+                    <div className="api-key api-key-hidden">Hidden</div>
                     {!showOwner && onRotate && (
                       <Button
                         variant="secondary"
                         onClick={() => onRotate(device.id)}
                         disabled={rotatingId === device.id}
                       >
-                        {rotatingId === device.id ? 'Generating…' : 'Generate new session ID'}
+                        {rotatingId === device.id ? 'Generating...' : 'Generate new session ID'}
                       </Button>
                     )}
                   </>
