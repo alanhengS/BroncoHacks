@@ -30,6 +30,12 @@ export default function LoginPage() {
 
   return (
     <Layout title="Login - Engagement Monitor">
+      <button 
+        onClick={() => router.back()} 
+        className="back-btn-nice"
+      >
+        ← Back
+      </button>
       <AuthForm
         title="Welcome back"
         subtitle="Log in to your engagement dashboard."

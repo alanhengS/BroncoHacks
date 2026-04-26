@@ -37,6 +37,12 @@ export default function RegisterPage() {
 
   return (
     <Layout title="Register - Engagement Monitor">
+      <button 
+        onClick={() => router.back()} 
+        className="back-btn-nice"
+      >
+        ← Back
+      </button>
       <AuthForm
         title="Create your account"
         subtitle="Start monitoring classroom engagement in seconds."
