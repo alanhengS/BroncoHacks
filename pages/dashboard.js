@@ -8,6 +8,7 @@ import { PulsePanel } from '../components/dashboard/PulsePanel';
 import { SentimentSummary } from '../components/dashboard/SentimentSummary';
 import { StatsPanel } from '../components/dashboard/StatsPanel';
 import { RecentEvents } from '../components/dashboard/RecentEvents';
+import { TeachersPanel } from '../components/dashboard/TeachersPanel';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { api } from '../lib/apiClient';
 
@@ -66,20 +67,24 @@ export default function DashboardPage() {
     );
   }
 
-  const { currentSentiment, statistics, connectedDevices, recentEvents } = data;
+  const { scope, currentSentiment, statistics, connectedDevices, recentEvents, teachers } = data;
+  const isAdmin = scope === 'admin';
   const showAlert = currentSentiment.percentageBad > 45 && currentSentiment.total > 0;
 
   return (
     <Layout title="Dashboard - Engagement Monitor">
       <div className="page-heading">
-        <h2>Engagement dashboard</h2>
-        <p className="muted">Welcome back, <strong>{user.username}</strong> — role: {user.role}</p>
+        <h2>{isAdmin ? 'Administrator overview' : 'Engagement dashboard'}</h2>
+        <p className="muted">
+          Welcome back, <strong>{user.username}</strong> — role: {user.role}
+          {isAdmin && <span> · viewing all teachers&apos; data</span>}
+        </p>
       </div>
 
       {showAlert && (
         <Alert kind="warning">
-          <strong>Heads up:</strong> high confusion or negative sentiment detected. Consider pausing
-          to re-engage the class.
+          <strong>Heads up:</strong> high confusion or negative sentiment detected
+          {isAdmin ? ' across the school' : ''}. Consider re-engaging affected classes.
         </Alert>
       )}
 
@@ -89,12 +94,15 @@ export default function DashboardPage() {
           <SentimentSummary summary={currentSentiment} />
           <StatsPanel statistics={statistics} />
         </div>
+        {isAdmin && <TeachersPanel teachers={teachers} />}
         <RecentEvents events={recentEvents} />
       </div>
 
       <div className="row-actions" style={{ marginTop: '1.5rem' }}>
         <Button onClick={fetchData}>Refresh</Button>
-        <Link href="/devices" className="btn btn-secondary">Manage devices</Link>
+        <Link href="/devices" className="btn btn-secondary">
+          {isAdmin ? 'View all devices' : 'Manage devices'}
+        </Link>
       </div>
     </Layout>
   );
