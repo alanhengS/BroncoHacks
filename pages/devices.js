@@ -9,16 +9,19 @@ import { useRequireAuth } from '../hooks/useRequireAuth';
 import { api } from '../lib/apiClient';
 
 export default function DevicesPage() {
-  const { ready } = useRequireAuth();
+  const { ready, user } = useRequireAuth();
   const [devices, setDevices] = useState([]);
+  const [scope, setScope] = useState('teacher');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [rotatingId, setRotatingId] = useState(null);
 
   const fetchDevices = useCallback(async () => {
     try {
-      const { devices } = await api.get('/api/devices');
+      const { devices, scope } = await api.get('/api/devices');
       setDevices(devices);
+      setScope(scope || 'teacher');
       setError('');
     } catch (e) {
       setError(e.message || 'Failed to load devices');
@@ -38,6 +41,19 @@ export default function DevicesPage() {
     setShowForm(false);
   };
 
+  const handleRotate = async (deviceId) => {
+    setRotatingId(deviceId);
+    setError('');
+    try {
+      const { device } = await api.post('/api/devices/rotate', { deviceId });
+      setDevices((prev) => prev.map((d) => (d.id === device.id ? device : d)));
+    } catch (e) {
+      setError(e.message || 'Failed to rotate key');
+    } finally {
+      setRotatingId(null);
+    }
+  };
+
   if (!ready || loading) {
     return (
       <Layout title="Devices">
@@ -46,10 +62,17 @@ export default function DevicesPage() {
     );
   }
 
+  const isAdmin = scope === 'admin';
+
   return (
     <Layout title="Devices - Engagement Monitor">
       <div className="page-heading row-between">
-        <h2>Device management</h2>
+        <div>
+          <h2>{isAdmin ? 'All devices' : 'Device management'}</h2>
+          {isAdmin && (
+            <p className="muted">Showing every device across every teacher.</p>
+          )}
+        </div>
         <Button onClick={() => setShowForm((v) => !v)}>
           {showForm ? 'Cancel' : '+ Add device'}
         </Button>
@@ -63,19 +86,24 @@ export default function DevicesPage() {
         </div>
       )}
 
-      <DeviceList devices={devices} />
+      <DeviceList
+        devices={devices}
+        showOwner={isAdmin}
+        onRotate={isAdmin ? undefined : handleRotate}
+        rotatingId={rotatingId}
+      />
 
       {devices.length > 0 && (
         <div style={{ marginTop: '2rem' }}>
           <Card title="📋 ESP32 setup">
             <ol className="setup-list">
-              <li>Copy the API key for your device.</li>
+              <li><strong>Copy the API key when it’s shown</strong> — it is only visible at creation or right after rotating.</li>
               <li>Flash the ESP32 with your WiFi credentials and the API key.</li>
               <li>Wire buttons to GPIO pins (Good: 12, Bad: 13, Question: 14).</li>
               <li>POST to <code>/api/sentiment</code> with header <code>x-api-key</code> and body <code>{'{ "status": "good" }'}</code>.</li>
             </ol>
             <p className="muted" style={{ marginTop: '1rem' }}>
-              See <code>ESP32_CODE_EXAMPLE.md</code> for a complete sketch.
+              Lost a key? Click <em>Generate new key</em> on the device — the old key stops working immediately.
             </p>
           </Card>
         </div>

@@ -33,7 +33,10 @@ export function RecentEvents({ events }) {
             <li key={e.id} className={`event event-${meta.tone}`}>
               <div>
                 <div className="event-label">{meta.label}</div>
-                <div className="event-device">{e.deviceName}</div>
+                <div className="event-device">
+                  {e.deviceName}
+                  {e.ownerUsername && <span className="muted"> · {e.ownerUsername}</span>}
+                </div>
               </div>
               <div className="event-time">{timeAgo(e.timestamp)}</div>
             </li>

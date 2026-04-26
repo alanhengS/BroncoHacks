@@ -35,14 +35,18 @@ export default function RegisterPage() {
     }
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) router.back();
+    else router.push('/');
+  };
+
   return (
     <Layout title="Register - Engagement Monitor">
-      <button 
-        onClick={() => router.back()} 
-        className="back-btn-nice"
-      >
-        ← Back
-      </button>
+      <div className="auth-shell">
+        <button type="button" onClick={handleBack} className="back-link">
+          ← Back
+        </button>
+      </div>
       <AuthForm
         title="Create your account"
         subtitle="Start monitoring classroom engagement in seconds."
@@ -62,7 +66,6 @@ export default function RegisterPage() {
           <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="teacher">Teacher</option>
             <option value="administrator">Administrator</option>
-            <option value="student">Student</option>
           </select>
         </FormField>
         <FormField label="Password" htmlFor="password">

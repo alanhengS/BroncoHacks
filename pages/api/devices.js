@@ -1,13 +1,21 @@
 import { requireSessionUser, sendError } from '../../lib/server/session';
-import { createDevice, listDevices } from '../../lib/server/store';
+import { createDevice, listDevices, listAllDevicesWithOwner } from '../../lib/server/store';
+
+function stripKey({ apiKey, ...rest }) {
+  return rest;
+}
 
 export default async function handler(req, res) {
   try {
     const user = await requireSessionUser(req);
 
     if (req.method === 'GET') {
+      if (user.role === 'administrator') {
+        const devices = await listAllDevicesWithOwner();
+        return res.status(200).json({ scope: 'admin', devices: devices.map(stripKey) });
+      }
       const devices = await listDevices(user.id);
-      return res.status(200).json({ devices });
+      return res.status(200).json({ scope: 'teacher', devices: devices.map(stripKey) });
     }
 
     if (req.method === 'POST') {
