@@ -16,7 +16,7 @@ export function DeviceList({ devices, showOwner = false, onRotate, rotatingId })
   return (
     <div className="stack">
       {devices.map((device) => {
-        const hasKey = Boolean(device.apiKey);
+        const hasSession = Boolean(device.sessionId);
         return (
           <Card key={device.id}>
             <div className="device-row">
@@ -31,16 +31,16 @@ export function DeviceList({ devices, showOwner = false, onRotate, rotatingId })
                 )}
               </div>
               <div className="device-key">
-                <small className="muted">API key</small>
-                {hasKey ? (
+                <small className="muted">Session ID</small>
+                {hasSession ? (
                   <>
-                    <div className="api-key">{device.apiKey}</div>
+                    <div className="api-key">{device.sessionId}</div>
                     <small className="muted" style={{ fontSize: '0.75rem' }}>
                       Copy now — this is the only time it will be shown.
                     </small>
                     <Button
                       variant="secondary"
-                      onClick={() => navigator.clipboard.writeText(device.apiKey)}
+                      onClick={() => navigator.clipboard.writeText(device.sessionId)}
                     >
                       Copy
                     </Button>
@@ -54,7 +54,7 @@ export function DeviceList({ devices, showOwner = false, onRotate, rotatingId })
                         onClick={() => onRotate(device.id)}
                         disabled={rotatingId === device.id}
                       >
-                        {rotatingId === device.id ? 'Generating…' : 'Generate new key'}
+                        {rotatingId === device.id ? 'Generating…' : 'Generate new session ID'}
                       </Button>
                     )}
                   </>

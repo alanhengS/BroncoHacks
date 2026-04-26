@@ -97,13 +97,13 @@ export default function DevicesPage() {
         <div style={{ marginTop: '2rem' }}>
           <Card title="📋 ESP32 setup">
             <ol className="setup-list">
-              <li><strong>Copy the API key when it’s shown</strong> — it is only visible at creation or right after rotating.</li>
-              <li>Flash the ESP32 with your WiFi credentials and the API key.</li>
+              <li><strong>Copy the session ID when it’s shown</strong> — it is only visible at creation or right after rotating.</li>
+              <li>Flash the ESP32 with your WiFi credentials and the session ID.</li>
               <li>Wire buttons to GPIO pins (Good: 12, Bad: 13, Question: 14).</li>
-              <li>POST to <code>/api/sentiment</code> with header <code>x-api-key</code> and body <code>{'{ "status": "good" }'}</code>.</li>
+              <li>POST to <code>/api/sentiment</code> with header <code>x-session-id</code> and body <code>{'{ "status": "good" }'}</code>.</li>
             </ol>
             <p className="muted" style={{ marginTop: '1rem' }}>
-              Lost a key? Click <em>Generate new key</em> on the device — the old key stops working immediately.
+              Lost a session ID? Click <em>Generate new session ID</em> on the device — the old one stops working immediately.
             </p>
           </Card>
         </div>
